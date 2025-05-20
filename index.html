@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fictional Worlds Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app" class="theme-dark">
+        <header class="main-header">
+            <div class="logo">
+                <h1>Fictional Worlds Hub</h1>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#" class="nav-link active" data-view="store">STORE</a></li>
+                    <li><a href="#" class="nav-link" data-view="library">LIBRARY</a></li>
+                    <li><a href="#" class="nav-link" data-view="community">COMMUNITY</a></li>
+                </ul>
+            </nav>
+            <div class="user-info">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search...">
+                    <button id="search-button">🔍</button>
+                </div>
+                <div class="theme-toggle">
+                    <button id="theme-toggle-btn">🌙</button>
+                </div>
+                <div class="user-profile">
+                    <span class="username" id="username">Loading...</span>
+                    <div class="avatar">
+                        <img id="user-avatar" src="" alt="User Avatar">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <!-- STORE VIEW -->
+            <section id="store-view" class="view active">
+                <div class="store-container">
+                    <aside class="sidebar">
+                        <h2>Categories</h2>
+                        <ul class="category-list">
+                            <li><a href="#" class="category active" data-category="all">All Media</a></li>
+                            <li><a href="#" class="category" data-category="games">Games</a></li>
+                            <li><a href="#" class="category" data-category="movies">Movies</a></li>
+                            <li><a href="#" class="category" data-category="books">Books</a></li>
+                            <li><a href="#" class="category" data-category="tv-shows">TV Shows</a></li>
+                        </ul>
+                        <h2>Filters</h2>
+                        <div class="filters">
+                            <div class="filter-group">
+                                <h3>Sort By</h3>
+                                <select id="sort-select">
+                                    <option value="newest">Newest</option>
+                                    <option value="popular">Most Popular</option>
+                                    <option value="rating">Highest Rated</option>
+                                </select>
+                            </div>
+                        </div>
+                    </aside>
+                    <div class="store-content">
+                        <div class="featured-section">
+                            <h2>Featured</h2>
+                            <div class="featured-grid" id="featured-grid">
+                                <!-- Featured media will be inserted here -->
+                                <div class="loading-container">
+                                    <div class="loading-spinner"></div>
+                                    <p>Loading featured media...</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="all-media-section">
+                            <h2>All Media</h2>
+                            <div class="media-grid" id="media-grid">
+                                <!-- Media items will be inserted here -->
+                                <div class="loading-container">
+                                    <div class="loading-spinner"></div>
+                                    <p>Loading media...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- LIBRARY VIEW -->
+            <section id="library-view" class="view">
+                <div class="library-container">
+                    <h2>My Library</h2>
+                    <div class="library-grid" id="library-grid">
+                        <!-- Library items will be inserted here -->
+                        <div class="empty-library">
+                            <p>Your library is empty. Generate and save some media!</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- COMMUNITY VIEW -->
+            <section id="community-view" class="view">
+                <div class="community-container">
+                    <aside class="chat-sidebar">
+                        <h2>Channels</h2>
+                        <ul class="channel-list">
+                            <li><a href="#" class="channel active" data-channel="general">General</a></li>
+                            <li><a href="#" class="channel" data-channel="games">Games</a></li>
+                            <li><a href="#" class="channel" data-channel="movies">Movies</a></li>
+                            <li><a href="#" class="channel" data-channel="books">Books</a></li>
+                            <li><a href="#" class="channel" data-channel="tv-shows">TV Shows</a></li>
+                        </ul>
+                        <h2>Online Users</h2>
+                        <ul class="user-list" id="online-users">
+                            <!-- Online users will be inserted here -->
+                        </ul>
+                    </aside>
+                    <div class="chat-content">
+                        <div class="chat-messages" id="chat-messages">
+                            <!-- Chat messages will be inserted here -->
+                        </div>
+                        <div class="chat-input">
+                            <input type="text" id="message-input" placeholder="Type a message...">
+                            <button id="send-button">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MEDIA CREATION SECTION -->
+            <section id="media-creation" class="modal">
+                <div class="modal-content">
+                    <span class="close-button">&times;</span>
+                    <h2>Generate New Media</h2>
+                    <form id="generation-form">
+                        <div class="form-group">
+                            <label for="media-type">Media Type:</label>
+                            <select id="media-type" required>
+                                <option value="">Select a type</option>
+                                <option value="game">Game</option>
+                                <option value="movie">Movie</option>
+                                <option value="book">Book</option>
+                                <option value="tv-show">TV Show</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="media-concept">Concept:</label>
+                            <input type="text" id="media-concept" placeholder="Enter a concept..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="media-genre">Genre:</label>
+                            <select id="media-genre" required>
+                                <option value="">Select a genre</option>
+                                <option value="action">Action</option>
+                                <option value="adventure">Adventure</option>
+                                <option value="rpg">RPG</option>
+                                <option value="simulation">Simulation</option>
+                                <option value="strategy">Strategy</option>
+                                <option value="sports">Sports</option>
+                                <option value="racing">Racing</option>
+                                <option value="puzzle">Puzzle</option>
+                                <option value="horror">Horror</option>
+                                <option value="sci-fi">Sci-Fi</option>
+                                <option value="fantasy">Fantasy</option>
+                                <option value="comedy">Comedy</option>
+                                <option value="drama">Drama</option>
+                                <option value="thriller">Thriller</option>
+                                <option value="mystery">Mystery</option>
+                                <option value="romance">Romance</option>
+                            </select>
+                        </div>
+                        <button type="submit" id="generate-button">Generate</button>
+                    </form>
+                    <div class="loading-container" id="generation-loading" style="display: none;">
+                        <div class="loading-spinner"></div>
+                        <p>Generating your media...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- MEDIA DETAIL VIEW -->
+            <section id="media-detail" class="modal">
+                <div class="modal-content">
+                    <span class="close-detail">&times;</span>
+                    <div class="media-detail-container">
+                        <div class="media-detail-header">
+                            <div class="media-detail-image">
+                                <img id="detail-image" src="" alt="Media Cover">
+                            </div>
+                            <div class="media-detail-info">
+                                <h2 id="detail-title"></h2>
+                                <p class="detail-type-year"><span id="detail-type"></span> • <span id="detail-year"></span></p>
+                                <div class="detail-meta">
+                                    <span id="detail-runtime"></span>
+                                    <span id="detail-rating"></span>
+                                    <span id="detail-genre"></span>
+                                </div>
+                                <div class="detail-creator">
+                                    <p><strong id="detail-creator-label"></strong> <span id="detail-creator"></span></p>
+                                </div>
+                                <div class="detail-actions">
+                                    <button id="save-button">Save to Library</button>
+                                    <button id="share-button">Share</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="media-detail-body">
+                            <h3>Description</h3>
+                            <p id="detail-description"></p>
+                            
+                            <div id="detail-specifics">
+                                <!-- Type-specific details will be added here -->
+                            </div>
+                            
+                            <h3>Reviews</h3>
+                            <div id="detail-reviews">
+                                <!-- Reviews will be added here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <div class="fab">
+            <button id="create-button">+</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4c6229722a6346bc8eb5cb0e5eae5d41","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
+

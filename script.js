@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load initial data
     loadMedia();
     
-    // Subscribe to database changes
+    // Subscribe to changes
     subscribeToChanges();
 });
 
@@ -266,23 +266,20 @@ function loadChannelMessages(channel) {
     const messagesContainer = document.getElementById('chat-messages');
     messagesContainer.innerHTML = '';
     
-    room.collection('message')
+    // Get messages directly without using .then() since getList() returns the array directly
+    const messages = room.collection('message')
         .filter({ channel: channel })
-        .getList()
-        .then(messages => {
-            // Sort messages by creation time (oldest first)
-            messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-            
-            messages.forEach(message => {
-                addMessageToChat(message);
-            });
-            
-            // Scroll to bottom
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        })
-        .catch(error => {
-            console.error('Error loading messages:', error);
-        });
+        .getList();
+    
+    // Sort messages by creation time (oldest first)
+    messages.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    
+    messages.forEach(message => {
+        addMessageToChat(message);
+    });
+    
+    // Scroll to bottom
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
 // Add message to chat
@@ -311,84 +308,75 @@ function addMessageToChat(message) {
 }
 
 // Send message
-function sendMessage() {
+async function sendMessage() {
     const messageInput = document.getElementById('message-input');
     const text = messageInput.value.trim();
     
     if (text === '') return;
     
-    room.collection('message').create({
-        channel: currentChannel,
-        text: text
-    })
-    .then(() => {
+    try {
+        await room.collection('message').create({
+            channel: currentChannel,
+            text: text
+        });
+        
         messageInput.value = '';
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error sending message:', error);
-    });
+    }
 }
 
 // Load online users
-function loadOnlineUsers() {
+async function loadOnlineUsers() {
     const usersList = document.getElementById('online-users');
     usersList.innerHTML = '';
     
-    room.getPresenceInfo()
-        .then(info => {
-            const users = info.users || [];
+    try {
+        const info = await room.getPresenceInfo();
+        const users = info.users || [];
+        
+        if (users.length === 0) {
+            const emptyMessage = document.createElement('li');
+            emptyMessage.textContent = 'No users online';
+            usersList.appendChild(emptyMessage);
+            return;
+        }
+        
+        users.forEach(user => {
+            const userElement = document.createElement('li');
+            userElement.className = 'online-user';
             
-            if (users.length === 0) {
-                const emptyMessage = document.createElement('li');
-                emptyMessage.textContent = 'No users online';
-                usersList.appendChild(emptyMessage);
-                return;
-            }
+            const avatarUrl = `https://images.websim.com/avatar/${user.username}`;
             
-            users.forEach(user => {
-                const userElement = document.createElement('li');
-                userElement.className = 'online-user';
-                
-                const avatarUrl = `https://images.websim.com/avatar/${user.username}`;
-                
-                userElement.innerHTML = `
-                    <div class="user-avatar">
-                        <img src="${avatarUrl}" alt="${user.username}">
-                    </div>
-                    <span class="user-name">${user.username}</span>
-                `;
-                
-                usersList.appendChild(userElement);
-            });
-        })
-        .catch(error => {
-            console.error('Error loading online users:', error);
+            userElement.innerHTML = `
+                <div class="user-avatar">
+                    <img src="${avatarUrl}" alt="${user.username}">
+                </div>
+                <span class="user-name">${user.username}</span>
+            `;
+            
+            usersList.appendChild(userElement);
         });
+    } catch (error) {
+        console.error('Error loading online users:', error);
+    }
 }
 
 // Load media from database
 function loadMedia() {
-    room.collection('media').getList()
-        .then(media => {
-            mediaCollection = media;
-            renderMediaGrid(media);
-            renderFeaturedMedia(media);
-        })
-        .catch(error => {
-            console.error('Error loading media:', error);
-        });
+    // Get media directly without using .then()
+    const media = room.collection('media').getList();
+    mediaCollection = media;
+    renderMediaGrid(media);
+    renderFeaturedMedia(media);
     
-    // Load library
-    room.collection('library')
+    // Get library directly
+    const library = room.collection('library')
         .filter({ username: currentUser?.username })
-        .getList()
-        .then(library => {
-            libraryCollection = library;
-            renderLibrary();
-        })
-        .catch(error => {
-            console.error('Error loading library:', error);
-        });
+        .getList();
+    
+    libraryCollection = library;
+    renderLibrary();
 }
 
 // Render media grid
@@ -747,7 +735,7 @@ async function generateMedia() {
 }
 
 // Save media to library
-function saveToLibrary(media) {
+async function saveToLibrary(media) {
     // Check if already in library
     const alreadySaved = libraryCollection.some(item => item.media_id === media.id);
     
@@ -756,32 +744,33 @@ function saveToLibrary(media) {
         return;
     }
     
-    room.collection('library').create({
-        media_id: media.id,
-        saved_at: new Date().toISOString()
-    })
-    .then(() => {
+    try {
+        await room.collection('library').create({
+            media_id: media.id,
+            saved_at: new Date().toISOString()
+        });
+        
         showNotification(`"${media.title}" added to your library!`);
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error saving to library:', error);
         showNotification('Error saving to library. Please try again.', 'error');
-    });
+    }
 }
 
 // Share media
-function shareMedia(media) {
+async function shareMedia(media) {
     // Create a message with media info
     const message = `Check out this ${media.type}: ${media.title} (${media.year}) - ${media.id}`;
     
-    // Send to current channel
-    room.collection('message').create({
-        channel: currentChannel,
-        text: message,
-        is_share: true,
-        media_id: media.id
-    })
-    .then(() => {
+    try {
+        // Send to current channel
+        await room.collection('message').create({
+            channel: currentChannel,
+            text: message,
+            is_share: true,
+            media_id: media.id
+        });
+        
         showNotification(`"${media.title}" shared in ${currentChannel} channel!`);
         
         // Close detail view
@@ -795,11 +784,10 @@ function shareMedia(media) {
         const views = document.querySelectorAll('.view');
         views.forEach(v => v.classList.remove('active'));
         document.getElementById('community-view').classList.add('active');
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('Error sharing media:', error);
         showNotification('Error sharing media. Please try again.', 'error');
-    });
+    }
 }
 
 // Filter media by category
@@ -950,4 +938,3 @@ notificationStyles.textContent = `
     }
 `;
 document.head.appendChild(notificationStyles);
-
